@@ -17,14 +17,12 @@ QByteArray getContent(QByteArray &bytes)
                 bytes.remove(0, 1);
 
             // Trash at the and of packet
-            if(bytes.indexOf(0xFF) > -1
+            while(bytes.indexOf(0xFF) > -1
                     && bytes.indexOf(0xFF, bytes.indexOf(0xFF)+1) > -1)
             {
                 int range = bytes.size() - bytes.indexOf(0xFF, bytes.indexOf(0xFF)+1)+1;
                 bytes.remove(bytes.indexOf(0xFF), range);
             }
-            else
-                return QByteArray();
 
             for(int i = 0; i < bytes.size(); i++)
             {
@@ -37,10 +35,9 @@ QByteArray getContent(QByteArray &bytes)
             QByteArray checkCrc;
             if(n >= 3)
             {
-                checkCrc.append(arr[0]);
-                checkCrc.append(arr[1]);
+                checkCrc.append(arr.left(arr.size()-1));
                 checkCrc.append('\0');
-                if(arr.lastIndexOf(crc8(checkCrc)))
+                if(arr.right(1) == crc8(checkCrc))
                 {
                     arr.chop(1);
                     check = false;
